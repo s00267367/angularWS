@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Service } from '@angular/core';
 import { inject } from '@angular/core'; 
-import { Observable } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { Car } from '../models/car.model';
 @Service()
 export class CarService {
@@ -16,5 +16,33 @@ export class CarService {
         return this.http.get<Car>(`${this.apiUrl}/${id}`);
     }
 
+    addCar(car: Car): Observable<Car> {
+        return this.http.post<Car>(this.apiUrl, car)
+        .pipe(
+        catchError(this.handleError)
+        )
+    }
+
+  
+    private handleError(error: HttpErrorResponse) {
+        if (error.status === 0) {
+        // A client-side or network error occurred. Handle it accordingly.
+        console.error('An error occurred:', error.error);
+        } else {
+        // The backend returned an unsuccessful response code.
+        // The response body may contain clues as to what went wrong.
+
+        if (error.status == 401 || error.status == 403) {
+
+            console.error('authorisation issue ' , error.status );
+            return throwError(() => new Error('You are not authorised for that action'));
+
+        }
+        console.error(
+            `Backend returned code ${error.status}, body was: `, error.error);
+        }
+        // Return an observable with a user-facing error message.
+        return throwError(() => new Error('Something bad happened; please try again later.'));
+    }
 
 }
