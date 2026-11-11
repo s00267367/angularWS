@@ -1,39 +1,49 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Car } from '../../models/car.model';
+import { Car, CreateCarDto } from '../../models/car.model';
 import { CarService } from '../../services/car.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 @Component({
-  imports: [FormsModule, ReactiveFormsModule],
+  imports: [RouterLink, FormsModule, ReactiveFormsModule],
   selector: 'app-car-form',
   styleUrl: './car-form.scss',
   templateUrl: './car-form.html',
 })
 export class CarForm {
+  saving = signal(false);
+  saveError = signal<string | null>(null);
+  
+
   private carService = inject(CarService);
   private router = inject(Router);
 
   private formBuilder = inject(FormBuilder);
-    carForm = this.formBuilder.group({
-      make: ['', Validators.required],
-      model: ['', Validators.required],
-      year: ['']
-  });
+    carForm = this.formBuilder.nonNullable.group({
+     make: ['', Validators.required],
+     model: ['', Validators.required],
+     year: this.formBuilder.control<number|null> (null)
+   });
+
 
   onSubmit(): void {
-    const carData: Car = this.carForm.value as Car;
-    console.log('Submitted Car:', carData);
-    
-    this.carService.addCar(carData).subscribe({
+    const { make, model, year } = this.carForm.getRawValue();
+    const newCar: CreateCarDto = { make, model, year: year ?? undefined };
+
+    this.saving.set(true);
+    this.saveError.set(null);
+
+    this.carService.addCar(newCar).subscribe({
       next: (response) => {
         console.log('Car added successfully:', response);
-        this.router.navigate(['/cars']); 
+        this.router.navigate(['/cars']);
       },
-      error: (error) => {
-        console.error('Error adding car:', error);
-      }
+    error: (err: Error) => {
+      this.saveError.set(err.message);
+      this.saving.set(false);
+    },
     });
   }
+
 }
 
 
