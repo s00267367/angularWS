@@ -3,8 +3,20 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { Car, CreateCarDto } from '../../models/car.model';
 import { CarService } from '../../services/car.service';
 import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatCardModule } from '@angular/material/card';
 @Component({
-  imports: [RouterLink, FormsModule, ReactiveFormsModule],
+  imports: [
+    RouterLink, 
+    FormsModule, 
+    ReactiveFormsModule, 
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatCardModule
+],
   selector: 'app-car-form',
   styleUrl: './car-form.scss',
   templateUrl: './car-form.html',
