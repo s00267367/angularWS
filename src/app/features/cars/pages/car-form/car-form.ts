@@ -29,12 +29,14 @@ export class CarForm {
   private carService = inject(CarService);
   private router = inject(Router);
 
+  readonly currentYear = new Date().getFullYear();
+
   private formBuilder = inject(FormBuilder);
-    carForm = this.formBuilder.nonNullable.group({
-     make: ['', Validators.required],
-     model: ['', Validators.required],
-     year: this.formBuilder.control<number|null> (null)
-   });
+  carForm = this.formBuilder.nonNullable.group({
+    make: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(30)]],
+    model: ['', [Validators.required, Validators.maxLength(30)]],
+    year: this.formBuilder.control<number | null>(null, [Validators.min(1950), Validators.max(this.currentYear + 1),])
+  });
 
 
   onSubmit(): void {
