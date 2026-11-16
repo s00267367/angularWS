@@ -1,6 +1,9 @@
 <form [formGroup]="carForm" (ngSubmit)="onSubmit()" class="car-form">
   <h2>Car Details Form</h2>
 
+  @if (saving()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
 
   <!-- Make Field -->
   <mat-form-field >
@@ -43,14 +46,11 @@
 
   @if (saveError(); as message) { <p role="alert">{{ message }}</p> }
   <div class="button-group">
-    <button type="submit" [disabled]="saving()">
+    <button matButton="elevated" type="submit" [disabled]="saving()">
       {{ saving() ? 'Saving...' : 'Save car' }}
     </button>
-    
-    <button>
-        <a routerLink="/cars">Cancel</a>
-    </button>
-    
+    <a matButton="tonal" routerLink="/cars">Cancel</a>
   </div>
+
 
 </form>
