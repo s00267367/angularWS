@@ -13,11 +13,15 @@ export const routes: Routes = [
     component: CarList
   },
   {
-    path: 'cars/id/:id',
+    path: 'cars/new',
+    component: CarForm
+  },
+  {
+    path: 'cars/:id',
     component: CarDetails
   },
   {
-    path: 'cars/new',
+    path: 'cars/:id/edit',
     component: CarForm
   }
 
