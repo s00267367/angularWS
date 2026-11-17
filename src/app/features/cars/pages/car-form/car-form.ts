@@ -2,6 +2,7 @@ import { Component, inject, input, signal, OnInit } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CreateCarDto } from '../../models/car.model';
 import { CarService } from '../../services/car.service';
+import {notBlank} from '../../../../shared/validators/not-blank.validator';
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { forbiddenValue } from '../../../../shared/validators/forbiddenValue.validator';
 
 @Component({
   imports: [
@@ -38,8 +40,8 @@ export class CarForm implements OnInit {
 
   private formBuilder = inject(FormBuilder);
   carForm = this.formBuilder.nonNullable.group({
-    make: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(30)]],
-    model: ['', [Validators.required, Validators.maxLength(30)]],
+    make: ['', [Validators.required, forbiddenValue('test'), notBlank, Validators.minLength(2), Validators.maxLength(30)]],
+    model: ['', [Validators.required, forbiddenValue('test'), notBlank, Validators.maxLength(30)]],
     year: this.formBuilder.control<number | null>(null, [Validators.min(1950), Validators.max(this.currentYear + 1),])
   });
 
