@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, signal, OnInit } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CreateCarDto } from '../../models/car.model';
 import { CarService } from '../../services/car.service';
@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+
 @Component({
   imports: [
     RouterLink, 
@@ -24,11 +25,12 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   styleUrl: './car-form.scss',
   templateUrl: './car-form.html',
 })
-export class CarForm {
+export class CarForm implements OnInit {
   saving = signal(false);
   saveError = signal<string | null>(null);
+  readonly id = input<string>();  // note this is optional by default
+  
   private snackBar = inject(MatSnackBar);
-
   private carService = inject(CarService);
   private router = inject(Router);
 
@@ -50,17 +52,34 @@ export class CarForm {
     this.saving.set(true);
     this.saveError.set(null);
 
-    this.carService.addCar(newCar).subscribe({
+    const id = this.id();
+
+    const request = id
+      ? this.carService.updateCar(id, newCar)
+      : this.carService.addCar(newCar);
+
+    request.subscribe({
       next: (response) => {
         this.snackBar.open(`${newCar.make} ${newCar.model} saved`, 'Close', { duration: 10000 });
         console.log('Car added successfully:', response);
         this.router.navigate(['/cars']);
       },
-    error: (err: Error) => {
-      this.saveError.set(err.message);
-      this.saving.set(false);
-      this.carForm.enable();
-    },
+      error: (err: Error) => {
+        this.saveError.set(err.message);
+        this.saving.set(false);
+        this.carForm.enable();
+      },
+    });
+  }
+
+  ngOnInit(): void {
+    const id = this.id();
+    if (!id) return; // adding a new car, nothing to load
+
+    this.carService.getCarById(id).subscribe({
+      next: (car) =>
+        this.carForm.patchValue({ make: car.make, model: car.model, year: car.year ?? null }),
+      error: (err: Error) => this.saveError.set(err.message),
     });
   }
 

@@ -8,5 +8,5 @@ import { RouterLink } from '@angular/router';
   templateUrl: './car-card.html',
 })
 export class CarCard {
-  car = input.required<Car>();
+  readonly car = input.required<Car>();
 }
