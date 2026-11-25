@@ -3,12 +3,13 @@ import { catchError, throwError } from 'rxjs';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthCustomService } from '../auth/auth-custom.service';
+import { environment } from '../../../environments/environment.development';
 
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const authService = inject(AuthCustomService);
 
-  const apiUri = `http://localhost:1610/api/v1`;
+  const apiUri = `${environment.apiUri}`;
 
   const jwt = authService.token;
 
