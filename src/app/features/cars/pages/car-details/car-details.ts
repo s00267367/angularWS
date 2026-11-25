@@ -6,6 +6,7 @@ import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { LoadState, withLoadState } from '../../../../shared/load-state';
 import { RouterLink, Router } from '@angular/router';
 import { MatButton } from '@angular/material/button';
+import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   imports: [RouterLink, MatButton],
   selector: 'app-car-details',
@@ -14,6 +15,7 @@ import { MatButton } from '@angular/material/button';
 })
 export class CarDetails {
 
+  private snackBar = inject(MatSnackBar);
   private carService = inject(CarService);
   private readonly router = inject(Router);
 
@@ -41,7 +43,15 @@ export class CarDetails {
       error: (err: Error) => {
         this.deleteError.set(err.message);
         this.deleting.set(false);
+        this.openErrorSnackBar(err.message);
       },
+    });
+  }
+
+  private openErrorSnackBar(message: string): void {
+    this.snackBar.open(message, 'Dismiss', {
+      duration: 15000,               // how long the snackbar stays visible (ms)
+      panelClass: ['error-snackbar'] // define this class in styles.scss
     });
   }
 
